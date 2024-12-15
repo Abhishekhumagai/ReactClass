@@ -9,13 +9,13 @@ function Navbar() {
   };
 
   return (
-    <div className="h-16 w-full shadow-md bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white flex items-center justify-between px-6 relative">
-      <div className="text-2xl font-bold flex items-center">
-        <div className="bg-gray-700 w-32  flex items-center justify-center rounded-full mr-2">
-          <img src="/public/image/hamro.png" alt="" />
+    <div className="h-16 w-full shadow-md bg-gradient-to-r from-gray-800 via-gray-900 to-black text-white flex items-center justify-between px-6 fixed top-0 z-[999] ">
+      <div className="text-2xl font-bold flex items-center  ">
+        <div className="bg-gray-700  flex items-center justify-center rounded-full mr-2 ">
+          <img src="/public/image/hamrobazar.png" alt="" height={"10px"} />
         </div>
       </div>
-      <ul className="hidden sm:flex gap-8 text-lg">
+      <ul className="hidden sm:flex gap-8 text-lg ">
         <NavLink to={"/home"}>
           <li className="hover:text-blue-400 cursor-pointer">Product</li>
         </NavLink>

@@ -9,7 +9,7 @@ import { useState } from "react";
 
 function Home() {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const {
     error,
     isLoading,
@@ -19,12 +19,16 @@ function Home() {
   } = useQuery({
     queryKey: ["Product", selectedCategory],
     queryFn: () =>
-      selectedCategory ? getSingleCategory(selectedCategory) : getAllProduct(),
+      selectedCategory === "all"
+        ? getAllProduct()
+        : getSingleCategory(selectedCategory),
   });
   const {
     error: categoryError,
     isError: isCategoryError,
     isPending: isCategoryPending,
+    isLoading: isCategoryLOADING,
+
     data: categoryAxiosData,
   } = useQuery({
     queryKey: ["allCategory"],
@@ -36,20 +40,28 @@ function Home() {
     isPending: singleisCategoryPending,
     data: singlecategoryAxiosData,
   } = useQuery({
-    queryKey: ["allCategory"],
+    queryKey: ["Category"],
     queryFn: () => getSingleCategory(selectedCategory),
   });
+
+  if (isLoading || isCategoryLOADING) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-xl font-semibold text-gray-500">Loading...</p>
+      </div>
+    );
+  }
   if (isPending || isCategoryPending || singleisCategoryPending) {
     return <div>Pending.....</div>;
   }
   if (isError || isCategoryError || singleisCategoryError) {
     console.error(error, categoryError || singlecategoryError);
-    return <div>Error.....</div>;
+    return <div>{error}</div>;
   }
-  const { data } = axiosData;
-  const { data: categoryData } = categoryAxiosData;
+
+  const data = axiosData;
   const { data: singlecategory } = singlecategoryAxiosData;
-  console.log(categoryData);
+  // console.log(singlecategoryAxiosData);
   const products = data?.map((product) => (
     <div
       key={product.id}
@@ -74,9 +86,17 @@ function Home() {
   };
 
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
-      <div style={{ display: "flex", justifyContent: "center", gap: "40px" }}>
-        {categoryData.map((category, index) => (
+    <div className="p-8 bg-gray-100 min-h-screen ">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "40px",
+          cursor: "pointer",
+        }}
+      >
+        <div onClick={() => handleCategoryClick("all")}> all</div>
+        {categoryAxiosData?.map((category, index) => (
           <div key={index} onClick={() => handleCategoryClick(category)}>
             {category}
           </div>
@@ -86,12 +106,6 @@ function Home() {
 
       {error && (
         <div className="text-center text-red-600 font-medium mb-4">{error}</div>
-      )}
-
-      {isLoading && (
-        <div className="text-center text-gray-600 font-medium mb-4">
-          Loading products...
-        </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

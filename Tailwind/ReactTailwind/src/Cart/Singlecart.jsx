@@ -1,58 +1,74 @@
 import { useParams } from "react-router-dom";
 import { getSinglecart } from "../api/cart";
 import { useQuery } from "@tanstack/react-query";
+
 function Singlecart() {
   const params = useParams();
   const newParams = params.id;
-  console.log(newParams);
+
   const {
     error,
     isLoading,
     isError,
-    isPending,
     data: axiosData,
   } = useQuery({
-    queryKey: ["cart"],
+    queryKey: ["cart", newParams],
     queryFn: () => getSinglecart(newParams),
   });
-  if (isLoading || isPending) {
-    return <div>loading.....</div>;
-  }
-  if (isError) {
-    return <div>Error.....</div>;
-  }
-  const { data } = axiosData;
-  return (
-    <>
-      <div style={{ color: "red" }}>{error}</div>
 
-      <div
-        style={{
-          margin: "10px",
-          border: "2px solid black",
-          width: "500px",
-          backgroundColor: "gray",
-        }}
-      >
-        <h2>{data.UserId}</h2>
-        <p>{data.date}</p>
-        <div>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-xl font-semibold text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  if (isError || error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-xl font-semibold text-red-500">
+          Error loading data!
+        </p>
+      </div>
+    );
+  }
+
+  const { data } = axiosData;
+
+  return (
+    <div className="flex flex-col items-center justify-center py-10 px-4">
+      <div className="w-full max-w-md bg-gray-700 text-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-bold mb-4 text-center">Cart Details</h2>
+        <div className="mb-4">
+          <p>
+            <span className="font-semibold">User ID:</span> {data.UserId}
+          </p>
+          <p>
+            <span className="font-semibold">Date:</span> {data.date}
+          </p>
+        </div>
+        <div className="space-y-4">
           {data?.products?.map((product) => (
-            <div key={product.productId}>
-              <img
-                src={product.image}
-                alt={product.title}
-                style={{ width: "50px" }}
-              />
-              ProductId: <p>{product.productId}</p>
-              product quantity: <p>{product.quantity}</p>
+            <div
+              key={product.productId}
+              className="flex items-center p-3 border border-gray-700 rounded-md bg-gray-500"
+            >
+              <div>
+                <p>
+                  <span className="font-semibold">Product ID:</span>
+                  {product.productId}
+                </p>
+                <p>
+                  <span className="font-semibold">Quantity:</span>
+                  {product.quantity}
+                </p>
+              </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* <button onClick={fetchProducts}>Single Carts</button> */}
-    </>
+    </div>
   );
 }
 

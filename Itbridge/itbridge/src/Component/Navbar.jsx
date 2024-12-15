@@ -19,7 +19,7 @@ function Navbar() {
     { link: "/contact", name: "Contact" },
   ];
   return (
-    <div className="h-16 w-full shadow-md bg-gradient-to-r from-white via-white to-white text-black flex items-center justify-between px-6 sticky top-0 z-10">
+    <div className="h-16 w-full shadow-md bg-gradient-to-r from-white via-white to-white text-black flex items-center justify-between px-6 sticky top-0 z-50">
       <div className="text-2xl font-bold flex items-center">
         <div className="bg-gray-700   flex items-center justify-center  mr-32">
           <div>
@@ -67,7 +67,7 @@ function Navbar() {
                   className={classNameNavlink}
                   to={item.link}
                 >
-                  <li className=" text-blue-600   hover:text-blue-400 cursor-pointer">
+                  <li className=" text-blue-600  hover:text-blue-400 cursor-pointer">
                     {item.name}
                   </li>
                 </NavLink>

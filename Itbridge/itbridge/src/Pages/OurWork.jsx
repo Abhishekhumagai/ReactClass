@@ -1,6 +1,52 @@
 import { NavLink } from "react-router-dom";
-import { projects } from "./projects";
+
+import { useEffect, useState } from "react";
+
 const OurWork = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const BASE_URL = "https://itbridge.com.np/api/";
+  async function ItWork() {
+    try {
+      const response = await fetch(`${BASE_URL}work`, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data, status: " + response.status);
+      }
+
+      const finaldata = await response.json();
+      setData(finaldata.data); // Assuming the response contains 'data' array
+    } catch (error) {
+      setError("Failed to load services. Please try again later.");
+      console.log("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    ItWork();
+  }, []);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-xl text-gray-600">
+        Loading services...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen text-xl text-red-600">
+        {error}
+      </div>
+    );
+  }
   return (
     <div className="bg-gray-100  ">
       <div className=" mx-auto   ">
@@ -11,18 +57,21 @@ const OurWork = () => {
           </h2>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mx-10 ">
-          {projects.map((project) => (
+          {data.map((project) => (
             <div
-              key={project.id}
+              key={project.status}
               className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 mx-10 my-10"
             >
               <img
-                src={project.image}
+                src={project.photo}
                 alt={project.title}
                 className="w-full h-60 object-cover"
               />
               <div className="mx-4 flex justify-between my-3 ">
                 <h3 className="text-xl font-semibold">{project.title}</h3>
+                <h3 className="text-xl font-semibold">{project.alias}</h3>
+                <h3 className="text-xl font-semibold">{project.slug}</h3>
+
                 <NavLink to={"/ourworkdes/" + project.id}>
                   <button>
                     <li className="text-blue-500 hover:text-blue-700  block  ">
