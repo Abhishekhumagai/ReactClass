@@ -13,7 +13,6 @@ const OurWorkDes = () => {
         <div className="text-center bg-gradient-to-r bg-[#9c9c9c] text-white py-12 mb-12 rounded-xl shadow-lg">
           <h2 className="text-4xl font-extrabold">{project.title}</h2>
         </div>
-
         {project ? (
           <div className="bg-white shadow-xl rounded-lg overflow-hidden mx-6 md:mx-12 lg:mx-24 my-10">
             <div className="flex gap-10">

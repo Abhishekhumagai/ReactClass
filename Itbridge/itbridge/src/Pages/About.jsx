@@ -1,84 +1,103 @@
+import { useEffect, useState } from "react";
+
+const BASE_URL = "https://itbridge.com.np/api/";
+
 function About() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  async function fetchAboutData() {
+    try {
+      const response = await fetch(`${BASE_URL}about-us`, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data, status: " + response.status);
+      }
+
+      const result = await response.json();
+      setData(result.data);
+    } catch (err) {
+      setError("Failed to load data. Please try again later.");
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchAboutData();
+  }, []);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen text-xl text-gray-600">
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-blue-500 border-opacity-75"></div>
+          <span className="mt-4">Loading About...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen text-xl text-red-600">
+        {error}
+      </div>
+    );
+  }
+
   return (
-    <div className="font-sans">
-      <div className="bg-[#9c9c9c] bg-[url('/image/computer.jpg')] bg-cover bg-center h-60 flex justify-center text-center about-image relative">
-        <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
-        <h2 className="text-5xl  font-extrabold text-white tracking-wider relative">
-          About
+    <div className="font-sans bg-gray-50">
+      {/* Hero Section */}
+      <div className="relative bg-cover bg-center  bg-[url('/image/computer.jpg')] h-60 flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-b from-black to-transparent opacity-75"></div>
+        <h2 className="text-5xl font-extrabold text-white z-10 drop-shadow-lg">
+          About Us
         </h2>
       </div>
 
-      <div className="py-16 px-6 lg:px-24">
-        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-12">
-          <div className="w-full lg:w-1/2">
-            <div className="overflow-hidden rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-500">
-              <img
-                src="../../public/image/it.jpg"
-                alt="Company Illustration"
-                className="object-cover w-full h-96"
-              />
-            </div>
-          </div>
-
-          <div className="lg:w-1/2 text-gray-800">
-            <h2 className="text-4xl font-bold text-black mb-4">Our Company</h2>
-            <p className="text-lg leading-8 mb-8">
-              IT-Bridge Nepal is a privately held company, consisting of a
-              creative and multi-talented team comprised of web designers, web
-              developers, and graphic designers. We provide a wide range of
-              services, including web design, development, mobile application
-              development, web hosting, and consulting. IT-Bridge Nepal offers
-              customer-oriented services and delivers creative and effective
-              results.
-            </p>
-
-            <h2 className="text-4xl font-bold text-black mb-4">Vision</h2>
-            <p className="text-lg leading-8 mb-8">
-              To be at the forefront of application development and be respected
-              for setting the highest standards of professionalism and quality
-              of service.
-            </p>
-
-            <h2 className="text-4xl font-bold text-black mb-4">
-              Why Choose Us?
-            </h2>
-            <ul className=" pl-6 text-lg leading-8 space-y-2">
-              <li>Avoid the Risk</li>
-              <li>Follow Conceptual Integrity</li>
-              <li>Process Control</li>
-              <li>Inspection and Testing</li>
-              <li>Product Cost and Quality</li>
-              <li>On-Time Delivery</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-gray-100 py-16">
-        <div className="text-center max-w-3xl mx-auto">
-          <h2 className="text-4xl font-bold text-black mb-4">Meet Our Team</h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Discover the passionate professionals driving innovation at
-            IT-Bridge Nepal.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            {["Abhishek", "Samir", "Ashim", "Anish"].map((name, idx) => (
+      {/* Content Section */}
+      <div className="py-16 px-6 lg:px-20">
+        <div className="flex flex-col gap-12">
+          {data.map((member, index) => (
+            <div
+              key={index}
+              className={`w-full  bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 p-8 ${
+                index % 2 === 0 ? "ml-auto" : "mr-auto"
+              }`}
+            >
               <div
-                key={idx}
-                className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-xl transition-shadow duration-300"
+                className={`flex flex-col lg:flex-row ${
+                  index % 2 === 0 ? "lg:flex-row-reverse" : ""
+                } items-center gap-8`}
               >
-                <div className="w-24 h-24 mx-auto mb-4">
+                {/* Image Section */}
+                <div className="w-full lg:w-1/3">
                   <img
-                    src={`/public/image/built.png`}
-                    alt={name}
-                    className="w-full h-full object-cover rounded-full"
+                    src={member.photo}
+                    alt={member.title}
+                    className="w-full h-full object-cover rounded-lg shadow-md"
                   />
                 </div>
-                <h3 className="text-lg font-semibold">{name}</h3>
-                <p className="text-sm text-gray-500">CEO</p>
+
+                {/* Text Section */}
+                <div className="w-full lg:w-2/3 text-center lg:text-left">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">
+                    {member.title}
+                  </h3>
+                  <p
+                    className="text-lg text-gray-600 leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: member.excerpt }}
+                  />
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

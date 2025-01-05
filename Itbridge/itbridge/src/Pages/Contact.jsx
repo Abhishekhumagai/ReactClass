@@ -1,4 +1,53 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { contact } from "../api/api";
+import { BASE_URL } from "../constants/Envconstants";
+import Swal from "sweetalert2";
+
 const Contact = () => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+
+    formState: { errors },
+  } = useForm();
+  const queryClient = useQueryClient();
+  console.log(queryClient);
+
+  const { mutate: addcontactMutate, isLoading } = useMutation({
+    mutationFn: contact,
+    onError: (err) => {
+      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Failed to add contact!",
+      });
+    },
+    onSuccess: () => {
+      Swal.fire({
+        icon: "success",
+        title: "Success",
+        text: "Message sent successfully!",
+      });
+      reset();
+    },
+  });
+
+  const onsubmit = (data) => {
+    const contactdata = {
+      name: data.name,
+      email: data.email,
+      phone_no: data.phone_no,
+      subject: data.subject,
+      message: data.message,
+      status: true,
+    };
+
+    addcontactMutate(contactdata);
+  };
+  console.log(BASE_URL);
   return (
     <div className="min-h-screen text-black">
       <div className="text-center bg-[#9c9c9c] h-60 mb-12  bg-[url('/image/contact.jpg')] bg-cover bg-center flex items-center justify-center">
@@ -13,8 +62,11 @@ const Contact = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <form className="space-y-6 bg-white p-6 md:p-8 rounded-md shadow-md">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 my-10">
+          <form
+            onSubmit={handleSubmit(onsubmit)}
+            className="space-y-6 bg-white p-6 md:p-8 rounded-md shadow-md"
+          >
             <div>
               <label
                 htmlFor="name"
@@ -24,10 +76,14 @@ const Contact = () => {
               </label>
               <input
                 type="text"
-                id="name"
                 placeholder="Please enter your name"
                 className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                {...register("name", { required: true })}
               />
+
+              {errors.name && (
+                <span className="text-red-600">This field is required</span>
+              )}
             </div>
 
             <div>
@@ -39,10 +95,20 @@ const Contact = () => {
               </label>
               <input
                 type="email"
-                id="email"
                 placeholder="example@mail.com"
                 className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Please enter a valid email address",
+                  },
+                })}
               />
+
+              {errors.email && (
+                <span className="text-red-600">{errors.email.message}</span>
+              )}
             </div>
 
             <div>
@@ -54,10 +120,20 @@ const Contact = () => {
               </label>
               <input
                 type="tel"
-                id="phone"
                 placeholder="+1 234 567 890"
                 className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                {...register("phone_no", {
+                  required: "Phone number is required",
+                  pattern: {
+                    value: /^[0-9]{10,}$/,
+                    message: "Phone number must have at least 10 digits",
+                  },
+                })}
               />
+
+              {errors.phone_no && (
+                <span className="text-red-600">{errors.phone_no.message}</span>
+              )}
             </div>
 
             <div>
@@ -69,10 +145,14 @@ const Contact = () => {
               </label>
               <input
                 type="text"
-                id="subject"
                 placeholder="Enter the subject"
                 className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
+                {...register("subject", { required: true })}
               />
+
+              {errors.subject && (
+                <span className="text-red-600">This field is required</span>
+              )}
             </div>
 
             <div>
@@ -83,19 +163,27 @@ const Contact = () => {
                 Message
               </label>
               <textarea
-                id="message"
                 rows="4"
                 placeholder="Write your message here..."
                 className="mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500"
-              ></textarea>
+                {...register("message", { required: true })}
+              />
+              {errors.message && (
+                <span className="text-red-600">This field is required</span>
+              )}
             </div>
 
             <div>
               <button
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-purple-500"
+                disabled={isLoading}
+                className={`w-full ${
+                  isLoading
+                    ? "bg-gray-400"
+                    : "bg-purple-600 hover:bg-purple-700"
+                } text-white font-semibold py-2 px-4 rounded-md shadow`}
               >
-                Send Message
+                {isLoading ? "Sending..." : "Send Message"}
               </button>
             </div>
           </form>
@@ -104,13 +192,13 @@ const Contact = () => {
             <div className="bg-gray-100 p-6 rounded-md shadow-md">
               <h3 className="text-lg font-bold mb-4">Contact Details</h3>
               <p className="text-sm">
-                <strong>Phone:</strong> +1 234 567 890
+                <strong>Phone:</strong>977-9845046048
               </p>
               <p className="text-sm mt-2">
-                <strong>Email:</strong> contact@company.com
+                <strong>Email:</strong> info@itbridge.com.np
               </p>
               <p className="text-sm mt-2">
-                <strong>Address:</strong> 123 Business St, Cityville, Country
+                <strong>Address:</strong> Banepa-8 Shantinagar
               </p>
             </div>
 

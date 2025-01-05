@@ -9,6 +9,7 @@ import OurWorkDes from "./Pages/OurworkDes";
 import Layout from "./Component/Layout";
 import OurserviceDes from "./Pages/OurserviceDes";
 import Project from "./Pages/Project";
+import CareerDis from "./Pages/CareerDis";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function Router() {
           <Route path="ourservice" element={<OurService />} />
           <Route path="career" element={<Career />} />
           <Route path="/ourworkdes/:status" element={<OurWorkDes />} />
+          <Route path="/careerdis/:slug" element={<CareerDis />} />
           <Route path="project" element={<Project />} />
           <Route
             path="/servicedetails/:serviceName"
